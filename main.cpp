@@ -1,12 +1,47 @@
 #include<iostream>
+#include<vector>
 #include<glad/glad.h>
 #include<GLFW/glfw3.h>
 
-void ChangeWindowColor(float r, float g, float b, float alpha, GLFWwindow* window) {
-    glClearColor(r, g, b, alpha);
-    glClear(GL_COLOR_BUFFER_BIT);
-    glfwSwapBuffers(window);
-}
+class ApplicationWindow {
+    public:
+        GLFWwindow* window;
+
+        void setApplicationName(char* appName) {
+            ApplicationName = appName;
+        }
+
+        char* getApplicationName() {
+            return ApplicationName;
+        }
+
+        void setDimensions (int NewHeight, int NewWidth) {
+            height = NewHeight;
+            width = NewWidth;
+        }
+
+        std::vector<int> getDimensions() {
+            std::vector<int> vect { width, height };
+            return vect;
+        }
+
+        void CreateWindow() {
+            window = glfwCreateWindow(height, width, ApplicationName, NULL, NULL);
+        }
+
+        void ChangeWindowColor(float r, float g, float b, float alpha, GLFWwindow* window) {
+            glClearColor(r, g, b, alpha);
+            glClear(GL_COLOR_BUFFER_BIT);
+            glfwSwapBuffers(window);
+        }
+
+    private:
+        char* ApplicationName;
+
+        int height;
+        int width;
+
+};
 
 int main() {
 
@@ -16,27 +51,36 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(800, 800, "Hello World!", NULL, NULL);
+    ApplicationWindow applicationWindow;
+    
+    applicationWindow.setApplicationName("Hello World!");
+    applicationWindow.setDimensions(640, 480);
 
-    if(window == NULL) {
+    applicationWindow.CreateWindow();
+
+    if(applicationWindow.window == NULL) {
         std::cout << "Failed to create window! ):" << std::endl;
         glfwTerminate();
         return -1;
     }
-    
-    glfwMakeContextCurrent(window);
+
+    // In case I forgor
+    //std::vector vect = applicationWindow.getDimensions();
+
+    glfwMakeContextCurrent(applicationWindow.window);
 
     gladLoadGL();
 
     glViewport(0, 0, 800, 800);
 
-    ChangeWindowColor(0.7f, 0.3f, 0.5f, 1.0f, window);
+    applicationWindow.ChangeWindowColor(0.7f, 0.3f, 0.5f, 1.0f, applicationWindow.window);
 
-    while(!glfwWindowShouldClose(window)) {
+    // Loop until application is up and running
+    while(!glfwWindowShouldClose(applicationWindow.window)) {
         glfwPollEvents();
     }
 
-    glfwDestroyWindow(window);
+    glfwDestroyWindow(applicationWindow.window);
     glfwTerminate();
     return 0;
 }
